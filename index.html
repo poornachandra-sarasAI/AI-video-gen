@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AI Video Generator 🎬</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    textarea {
+      width: 400px;
+      height: 100px;
+      padding: 10px;
+      font-size: 14px;
+      border-radius: 8px;
+      border: none;
+      margin-bottom: 10px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      background: #2563eb;
+      color: white;
+      cursor: pointer;
+    }
+    button:disabled {
+      background: #555;
+    }
+    video {
+      margin-top: 20px;
+      width: 500px;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>AI Video Generator 🎥</h1>
+  <textarea id="prompt" placeholder="Enter your video prompt..."></textarea>
+  <br />
+  <button id="generateBtn">Generate Video</button>
+  
+  <div id="output"></div>
+
+  <script>
+    const btn = document.getElementById("generateBtn");
+    const output = document.getElementById("output");
+
+    btn.addEventListener("click", async () => {
+      const prompt = document.getElementById("prompt").value;
+      if (!prompt) {
+        alert("Please enter a prompt");
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerText = "Generating...";
+
+      try {
+        const res = await fetch("/api/generate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt }),
+        });
+        const data = await res.json();
+
+        if (data.video_url) {
+          output.innerHTML = `
+            <h3>Your Video:</h3>
+            <video controls autoplay src="${data.video_url}"></video>
+          `;
+        } else {
+          output.innerHTML = `<p style="color:red;">Error: No video URL returned.</p>`;
+        }
+      } catch (err) {
+        console.error(err);
+        output.innerHTML = `<p style="color:red;">Error generating video.</p>`;
+      }
+
+      btn.disabled = false;
+      btn.innerText = "Generate Video";
+    });
+  </script>
+</body>
+</html>
