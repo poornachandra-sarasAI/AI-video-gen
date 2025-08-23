@@ -2,68 +2,440 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AI Video Generator 🎬</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
   <style>
+    :root {
+      --primary: #3b82f6;
+      --primary-dark: #2563eb;
+      --accent: #10b981;
+      --dark: #111827;
+      --light: #f3f4f6;
+      --card: #1e293b;
+      --error: #ef4444;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
     body {
-      font-family: Arial, sans-serif;
-      background: #111;
-      color: white;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, var(--dark) 0%, #0f172a 100%);
+      color: var(--light);
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
       min-height: 100vh;
+      padding: 2rem 1rem;
     }
+    
+    .container {
+      max-width: 800px;
+      width: 100%;
+      margin: 0 auto;
+    }
+    
+    header {
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(90deg, #60a5fa, #34d399);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      display: inline-block;
+    }
+    
+    .subtitle {
+      color: #94a3b8;
+      font-size: 1.1rem;
+      font-weight: 300;
+    }
+    
+    .card {
+      background: var(--card);
+      border-radius: 1rem;
+      padding: 2rem;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+      margin-bottom: 2rem;
+      width: 100%;
+    }
+    
+    .input-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+    
     textarea {
-      width: 400px;
-      height: 100px;
-      padding: 10px;
-      font-size: 14px;
-      border-radius: 8px;
-      border: none;
-      margin-bottom: 10px;
+      width: 100%;
+      height: 120px;
+      padding: 1rem;
+      font-size: 1rem;
+      font-family: inherit;
+      border-radius: 0.5rem;
+      border: 1px solid #334155;
+      background: #0f172a;
+      color: white;
+      transition: all 0.3s ease;
+      resize: vertical;
     }
+    
+    textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+    }
+    
+    .button-container {
+      display: flex;
+      justify-content: center;
+    }
+    
     button {
-      padding: 10px 20px;
-      font-size: 16px;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 500;
       border: none;
-      border-radius: 8px;
-      background: #2563eb;
+      border-radius: 0.5rem;
+      background: var(--primary);
       color: white;
       cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 150px;
     }
+    
+    button:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
+    
+    button:active {
+      transform: translateY(0);
+      box-shadow: none;
+    }
+    
     button:disabled {
-      background: #555;
+      background: #475569;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
     }
+    
+    .output-container {
+      width: 100%;
+    }
+    
     video {
-      margin-top: 20px;
-      width: 500px;
-      border-radius: 10px;
+      width: 100%;
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    .video-info {
+      margin-bottom: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .error-message {
+      color: var(--error);
+      padding: 1rem;
+      background: rgba(239, 68, 68, 0.1);
+      border-radius: 0.5rem;
+      text-align: center;
+    }
+    
+    /* Loading Animation */
+    .loading-container {
+      margin: 2rem 0;
+      text-align: center;
+    }
+    
+    .loading-text {
+      margin-bottom: 1.5rem;
+      font-size: 1.2rem;
+    }
+    
+    .loading-spinner {
+      display: inline-block;
+      position: relative;
+      width: 80px;
+      height: 80px;
+    }
+    
+    .loading-spinner div {
+      position: absolute;
+      top: 33px;
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      background: var(--primary);
+      animation-timing-function: cubic-bezier(0, 1, 1, 0);
+    }
+    
+    .loading-spinner div:nth-child(1) {
+      left: 8px;
+      animation: loading-spinner1 0.6s infinite;
+    }
+    
+    .loading-spinner div:nth-child(2) {
+      left: 8px;
+      animation: loading-spinner2 0.6s infinite;
+    }
+    
+    .loading-spinner div:nth-child(3) {
+      left: 32px;
+      animation: loading-spinner2 0.6s infinite;
+    }
+    
+    .loading-spinner div:nth-child(4) {
+      left: 56px;
+      animation: loading-spinner3 0.6s infinite;
+    }
+    
+    @keyframes loading-spinner1 {
+      0% {transform: scale(0);}
+      100% {transform: scale(1);}
+    }
+    
+    @keyframes loading-spinner2 {
+      0% {transform: translate(0, 0);}
+      100% {transform: translate(24px, 0);}
+    }
+    
+    @keyframes loading-spinner3 {
+      0% {transform: scale(1);}
+      100% {transform: scale(0);}
+    }
+    
+    .generating-info {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      background: rgba(59, 130, 246, 0.1);
+      border-radius: 0.5rem;
+    }
+    
+    .generating-step {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.5rem;
+      opacity: 0.7;
+      transition: opacity 0.3s ease;
+    }
+    
+    .generating-step.active {
+      opacity: 1;
+    }
+    
+    .step-number {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: white;
+      font-size: 0.8rem;
+      margin-right: 0.75rem;
+    }
+    
+    .success-icon {
+      color: var(--accent);
+      margin-left: 0.5rem;
+    }
+    
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 2rem;
+      }
+      
+      .card {
+        padding: 1.5rem;
+      }
+    }
+    
+    .video-container {
+      position: relative;
+      overflow: hidden;
+      border-radius: 0.5rem;
+      margin-top: 1rem;
+    }
+    
+    .video-label {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.75rem;
+      font-weight: 500;
+    }
+    
+    .video-icon {
+      margin-right: 0.5rem;
+    }
+    
+    .footer {
+      margin-top: 2rem;
+      color: #64748b;
+      font-size: 0.9rem;
+      text-align: center;
     }
   </style>
 </head>
 <body>
-  <h1>AI Video Generator 🎥</h1>
-  <textarea id="prompt" placeholder="Enter your video prompt..."></textarea>
-  <br />
-  <button id="generateBtn">Generate Video</button>
-  
-  <div id="output"></div>
+  <div class="container">
+    <header>
+      <h1>AI Video Generator 🎥</h1>
+      <p class="subtitle">Transform your ideas into videos with AI</p>
+    </header>
+    
+    <div class="card">
+      <div class="input-group">
+        <label for="prompt">What video would you like to create?</label>
+        <textarea id="prompt" placeholder="Describe the video you want to generate in detail..."></textarea>
+      </div>
+      
+      <div class="button-container">
+        <button id="generateBtn">Generate Video</button>
+      </div>
+    </div>
+    
+    <div id="output" class="output-container"></div>
+    
+    <div class="footer">
+      Powered by Veo-3 AI • Created with ❤️
+    </div>
+  </div>
 
   <script>
     const btn = document.getElementById("generateBtn");
     const output = document.getElementById("output");
-
+    
+    // Generation process steps
+    const generationSteps = [
+      "Interpreting your prompt",
+      "Creating visual concept",
+      "Generating video frames",
+      "Adding motion and transitions",
+      "Finalizing your video"
+    ];
+    
+    // Create loading animation and progress updates
+    function createLoadingUI() {
+      const loadingHTML = `
+        <div class="loading-container">
+          <div class="loading-text">Creating your video</div>
+          
+          <div class="loading-spinner">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+          </div>
+          
+          <div class="generating-info">
+            ${generationSteps.map((step, index) => `
+              <div class="generating-step" id="step-${index}">
+                <div class="step-number">${index + 1}</div>
+                <div class="step-text">${step}</div>
+                <span class="success-icon" id="check-${index}" style="display:none;">✓</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+      
+      return loadingHTML;
+    }
+    
+    // Simulate progress through the generation steps
+    function simulateProgress(finalCallback) {
+      const totalSteps = generationSteps.length;
+      // Extended timings spread across ~1 minute (in milliseconds)
+      const stepsTimings = [8000, 18000, 30000, 45000]; // First 4 steps
+      // Last step will be triggered by finalCallback when the video is ready
+      
+      for (let i = 0; i < totalSteps - 1; i++) { // Only show first 4 steps automatically
+        setTimeout(() => {
+          const stepEl = document.getElementById(`step-${i}`);
+          const checkEl = document.getElementById(`check-${i}`);
+          
+          if (stepEl && checkEl) {
+            stepEl.classList.add('active');
+            checkEl.style.display = 'inline';
+          }
+        }, stepsTimings[i]);
+      }
+      
+      // The final step will be completed when finalCallback is called
+      return function completeLastStep() {
+        const stepEl = document.getElementById(`step-${totalSteps - 1}`);
+        const checkEl = document.getElementById(`check-${totalSteps - 1}`);
+        
+        if (stepEl && checkEl) {
+          stepEl.classList.add('active');
+          checkEl.style.display = 'inline';
+        }
+        
+        // Wait a moment for the user to see the final checkmark before showing the video
+        setTimeout(finalCallback, 1000);
+      };
+    }
+    
     btn.addEventListener("click", async () => {
       const prompt = document.getElementById("prompt").value;
       if (!prompt) {
-        alert("Please enter a prompt");
+        alert("Please enter a prompt for your video");
         return;
       }
 
       btn.disabled = true;
-      btn.innerText = "Generating...";
+      btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" style="margin-right: 8px" viewBox="0 0 16 16"><path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41zm-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9z"/><path fill-rule="evenodd" d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5.002 5.002 0 0 0 8 3zM3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9H3.1z"/></svg> Generating...';
 
+      // Show loading UI immediately
+      output.innerHTML = createLoadingUI();
+      
+      // Store the video data for later use
+      let videoData = null;
+      
+      // Set up the final step completion function
+      const completeLastStep = simulateProgress(() => {
+        // This will run after the last step is completed
+        if (videoData && videoData.video_url) {
+          output.innerHTML = `
+            <div class="card">
+              <div class="video-label">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="video-icon" viewBox="0 0 16 16">
+                  <path d="M0 1a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1V1zm4 0v6h8V1H4zm8 8H4v6h8V9zM1 1v2h2V1H1zm2 3H1v2h2V4zM1 7v2h2V7H1zm2 3H1v2h2v-2zm-2 3v2h2v-2H1zM15 1h-2v2h2V1zm-2 3v2h2V4h-2zm2 3h-2v2h2V7zm-2 3v2h2v-2h-2zm2 3h-2v2h2v-2z"/>
+                </svg>
+                Your Generated Video
+              </div>
+              <div class="video-container">
+                <video controls autoplay src="${videoData.video_url}"></video>
+              </div>
+            </div>
+          `;
+        }
+      });
+      
       try {
         const res = await fetch("/api/generate", {
           method: "POST",
@@ -73,20 +445,21 @@
         const data = await res.json();
 
         if (data.video_url) {
-          output.innerHTML = `
-            <h3>Your Video:</h3>
-            <video controls autoplay src="${data.video_url}"></video>
-          `;
+          // Store the data but don't update UI yet
+          videoData = data;
+          
+          // Complete the last step, which will then show the video
+          completeLastStep();
         } else {
-          output.innerHTML = `<p style="color:red;">Error: No video URL returned.</p>`;
+          output.innerHTML = `<div class="error-message">Error: No video URL returned from the server. Please try again.</div>`;
         }
       } catch (err) {
         console.error(err);
-        output.innerHTML = `<p style="color:red;">Error generating video.</p>`;
+        output.innerHTML = `<div class="error-message">Error generating video. Please check your connection and try again.</div>`;
       }
 
       btn.disabled = false;
-      btn.innerText = "Generate Video";
+      btn.innerHTML = 'Generate Video';
     });
   </script>
 </body>
