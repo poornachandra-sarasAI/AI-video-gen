@@ -1,1 +1,18 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+
+# Virtual environment
+venv/
+.env/     # in case someone accidentally makes a folder named .env
+
+# Environment variables
 .env
+.env.local
+*.env
+
+# IDE/editor stuff
+.vscode/
+.idea/
+*.swp

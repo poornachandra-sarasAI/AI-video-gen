@@ -1,0 +1,10 @@
+fastapi
+python-dotenv
+boto3
+google
+time
+python-dotenv
+dotenv
+pydantic
+uvicorn
+requests
