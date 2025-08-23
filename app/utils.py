@@ -41,7 +41,7 @@ def generate_and_upload(prompt: str) -> str:
         Filename=filename,
         Bucket=S3_BUCKET,
         Key=filename,
-        ExtraArgs={"ACL": "public-read", "ContentType": "video/mp4"},
+        ExtraArgs={"ContentType": "video/mp4"},
     )
 
     # 4. Public URL
