@@ -42,7 +42,7 @@ AI-video-gen/
 1. Clone the repository:
    ```bash
    git clone https://github.com/poornachandra-sarasAI/AI-video-gen.git
-   cd AI-video-gen/backend
+   cd AI-video-gen/app
    ```
 
 2. Set up a virtual environment:
